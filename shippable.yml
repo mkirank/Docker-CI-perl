@@ -1,0 +1,34 @@
+# Language setting
+language: none
+
+git:
+   submodules: false
+ 
+# using pre-defined build variables
+# full list http://docs.shippable.com/ci/advancedOptions/environmentVariables/
+env:
+  global:
+    - TEST_RESULTS_DIR=$SHIPPABLE_REPO_DIR/shippable/testresults
+    - CODE_COVERAGE_DIR=$SHIPPABLE_REPO_DIR/shippable/codecoverage
+    - TESTS_LOC_DIR=$SHIPPABLE_REPO_DIR/t
+    - MOD_LOC=$SHIPPABLE_REPO_DIR/lib/
+    - PERL_LOCAL_LIB_ROOT="$SHIPPABLE_REPO_DIR/perl5:$PERL_LOCAL_LIB_ROOT" 
+    - LANGUAGE=en_US.UTF-8
+ 
+build:
+  pre_ci_boot:
+    image_name: library/perl
+    image_tag: latest
+    pull: true        
+  ci:
+    - echo "Hello Perl World !"
+    - apt-get -qq install -y locales locales-all
+    - perl --version
+    - cpanm local::lib
+    - cpanm -q  --installdeps .
+    - docker --version
+    - mkdir -p $TEST_RESULTS_DIR && mkdir -p $CODE_COVERAGE_DIR -p $PERL_LOCAL_LIB_ROOT
+    - echo "${TEST_RESULTS_DIR}/${JOB_ID}_result.txt"
+    - prove  -v --formatter=TAP::Formatter::JUnit -l lib t >> "${TEST_RESULTS_DIR}/${JOB_ID}_result.xml"
+#   - echo "env1=$env1"
+#   - echo jobTriggeredByName="$JOB_TRIGGERED_BY_NAME"
