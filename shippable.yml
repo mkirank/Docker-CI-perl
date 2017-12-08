@@ -19,6 +19,7 @@ build:
   pre_ci_boot:
     image_name: library/perl
     image_tag: latest
+    options: "--net=host"
     pull: true        
   ci:
     - echo "Hello Perl World !"
